@@ -9,8 +9,10 @@ from rest_framework import status
 from .serializers import UserSignupSerializer, UserLoginSerializer, UserDetailSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 
 class SignupView(APIView):
+    permission_classes = [AllowAny]
     def post(self, request):
         serializer = UserSignupSerializer(data=request.data)
         if serializer.is_valid():
@@ -19,6 +21,8 @@ class SignupView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
+    permission_classes = [AllowAny]
+
     def post(self, request):
         serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -35,9 +39,11 @@ class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # instance is created upon call
         serializer = UserDetailSerializer(request.user)
         return Response(serializer.data)
 
+    # updating the data
     def put(self, request):
         serializer = UserDetailSerializer(request.user, data=request.data, partial=True)
         if serializer.is_valid():

@@ -13,7 +13,9 @@ class InvoiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Invoice
-        fields = ('id', 'invoice_number', 'date', 'payment_terms', 'due_date', 'po_number', 'subtotal', 'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items')
+        fields = '__all__'
+        # havent added notes
+        # fields = ('id', 'invoice_number', 'date', 'payment_terms', 'due_date', 'po_number', 'subtotal', 'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items')
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')

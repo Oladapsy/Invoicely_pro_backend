@@ -13,10 +13,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Invoice
-        fields = '__all__'
+        # fields = '__all__'
         # havent added notes
-        # fields = ('id', 'invoice_number', 'date', 'payment_terms', 'due_date', 'po_number', 'subtotal', 'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items')
-
+        fields = ( 'id', 'invoice_number', 'date', 'payment_terms', 'due_date', 'po_number', 'logo', 'sender', 'notes', 'customer_name', 'subtotal', 'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items' )
+    
     def create(self, validated_data):
         items_data = validated_data.pop('items')
         invoice = Invoice.objects.create(**validated_data)

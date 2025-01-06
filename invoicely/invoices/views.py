@@ -20,7 +20,6 @@ from reportlab.lib.utils import ImageReader
 from datetime import datetime
 
 
-
 # handle the messaging app
 from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
@@ -44,7 +43,9 @@ class InvoiceListCreateView(generics.ListCreateAPIView):
         # set the user field of the new invoice to the 
         # authenticated user. This associates the newly 
         # created invoice with the user who made the request.
+        # print('i am being called')
         serializer.save(user=self.request.user)
+        
 
 
 class InvoiceDetailView(generics.RetrieveUpdateDestroyAPIView):
@@ -194,76 +195,166 @@ class InvoiceDetailView(generics.RetrieveUpdateDestroyAPIView):
 # new pdf generator copilot
 
 
+# def generate_pdf_content(invoice):
+#     buffer = BytesIO()
+#     p = canvas.Canvas(buffer, pagesize=letter)
+
+#     # Page settings
+#     width, height = letter
+#     margin = 50
+
+#     # Draw Logo
+#     if invoice.logo:
+#         p.drawImage(f"{settings.MEDIA_ROOT}/{invoice.logo}", margin, height - 120, width=60, height=60)
+
+#     # Header section
+#     p.setFont("Helvetica-Bold", 20)
+#     p.drawString(width - 200, height - 70, "INVOICE")
+
+#     # Invoice details
+#     p.setFont("Helvetica", 10)
+#     p.drawString(width - 200, height - 90, f"Date: {datetime.strftime(invoice.date, '%b %d, %Y')}")
+#     p.drawString(width - 200, height - 110, f"Due Date: {datetime.strftime(invoice.due_date, '%b %d, %Y')}")
+#     p.drawString(width - 200, height - 130, f"PO Number: {invoice.po_number}")
+#     p.drawString(width - 200, height - 150, f"Balance Due: US${invoice.balance_due:.2f}")
+
+#     # Billing and shipping info
+#     p.setFont("Helvetica-Bold", 12)
+#     p.drawString(margin, height - 140, f"Bill To")
+#     p.drawString(margin + 200, height - 140, f"Ship To")
+#     p.setFont("Helvetica", 10)
+#     p.drawString(margin, height - 160, f"{invoice.customer_name}")
+#     p.drawString(margin + 200, height - 160, f"{invoice.customer_name}")
+
+#     # Table for items
+#     table_data = [["ITEM", "QUANTITY", "RATE", "AMOUNT"]]
+#     for item in invoice.items.all():
+#         table_data.append([item.description, item.quantity, f"US${item.rate:.2f}", f"US${item.amount:.2f}"])
+
+#     table_data.append(["", "", "Subtotal", f"US${invoice.subtotal:.2f}"])
+#     table_data.append(["", "", "Tax", f"US${invoice.tax:.2f}"])
+#     table_data.append(["", "", "Discount", f"-US${invoice.discount:.2f}"])
+#     table_data.append(["", "", "Shipment", f"US${invoice.shipment:.2f}"])
+#     table_data.append(["", "", "Total", f"US${invoice.total:.2f}"])
+
+#     table = Table(table_data, colWidths=[200, 100, 100, 100])
+#     table.setStyle(TableStyle([
+#         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),
+#         ('GRID', (0, 0), (-1, -1), 0.5, colors.orange),
+#         ('FONTNAME', (0, 0), (-1, 0), "Helvetica-Bold"),
+#         ('ALIGN', (1, 1), (-1, -1), "RIGHT"),
+#         ('ALIGN', (0, 0), (0, -1), "LEFT"),
+#     ]))
+
+#     table.wrapOn(p, margin, height - 400)
+#     table.drawOn(p, margin, height - 500)
+
+#     # Notes and Terms section
+#     y_position = 100  # Adjust the y_position based on content length
+#     p.setFont("Helvetica-Bold", 10)
+#     p.drawString(margin, y_position, "Notes:")
+#     p.setFont("Helvetica", 10)
+#     p.drawString(margin + 50, y_position, invoice.notes or "No additional notes.")
+
+#     p.setFont("Helvetica-Bold", 10)
+#     p.drawString(margin, y_position - 20, "Terms:")
+#     p.setFont("Helvetica", 10)
+#     p.drawString(margin + 50, y_position - 20, "All sales are final. Payment must be made within the specified terms.")
+
+#     p.showPage()
+#     p.save()
+#     buffer.seek(0)
+#     return buffer.getvalue()
+
+# newest pdf generator
 def generate_pdf_content(invoice):
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
 
-    # Page settings
+    # Page dimensions
     width, height = letter
     margin = 50
 
-    # Draw Logo
+    # Header Section
     if invoice.logo:
-        p.drawImage(f"{settings.MEDIA_ROOT}/{invoice.logo}", margin, height - 120, width=60, height=60)
+        p.drawImage(f"{settings.MEDIA_ROOT}/{invoice.logo}", margin, height - 100, width=50, height=50)
 
-    # Header section
-    p.setFont("Helvetica-Bold", 20)
-    p.drawString(width - 200, height - 70, "INVOICE")
-
-    # Invoice details
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(width - 200, height - 50, "INVOICE")
     p.setFont("Helvetica", 10)
-    p.drawString(width - 200, height - 90, f"Date: {datetime.strftime(invoice.date, '%b %d, %Y')}")
-    p.drawString(width - 200, height - 110, f"Due Date: {datetime.strftime(invoice.due_date, '%b %d, %Y')}")
-    p.drawString(width - 200, height - 130, f"PO Number: {invoice.po_number}")
-    p.drawString(width - 200, height - 150, f"Balance Due: US${invoice.balance_due:.2f}")
+    p.drawString(width - 200, height - 65, f"#{invoice.invoice_number}")
+    p.drawString(width - 200, height - 80, f"Date: {invoice.date}")
+    p.drawString(width - 200, height - 95, f"Due Date: {invoice.due_date}")
 
-    # Billing and shipping info
+    # Sender and Customer Information
     p.setFont("Helvetica-Bold", 12)
     p.drawString(margin, height - 140, f"Bill To")
     p.drawString(margin + 200, height - 140, f"Ship To")
+
     p.setFont("Helvetica", 10)
     p.drawString(margin, height - 160, f"{invoice.customer_name}")
     p.drawString(margin + 200, height - 160, f"{invoice.customer_name}")
 
-    # Table for items
+    # Payment Terms and PO Number
+    p.setFont("Helvetica-Bold", 12)
+    p.drawString(margin, height - 200, "Payment Terms")
+    p.drawString(margin + 200, height - 200, "PO Number")
+
+    p.setFont("Helvetica", 10)
+    p.drawString(margin, height - 220, f"{invoice.payment_terms}")
+    p.drawString(margin + 200, height - 220, f"{invoice.po_number}")
+
+    # Table Headers
     table_data = [["ITEM", "QUANTITY", "RATE", "AMOUNT"]]
     for item in invoice.items.all():
-        table_data.append([item.description, item.quantity, f"US${item.rate:.2f}", f"US${item.amount:.2f}"])
+        table_data.append([item.description, str(item.quantity), f"US${item.rate:.2f}", f"US${item.amount:.2f}"])
 
+    # Add Subtotal, Tax, Discount, Shipment, and Total
     table_data.append(["", "", "Subtotal", f"US${invoice.subtotal:.2f}"])
     table_data.append(["", "", "Tax", f"US${invoice.tax:.2f}"])
     table_data.append(["", "", "Discount", f"-US${invoice.discount:.2f}"])
     table_data.append(["", "", "Shipment", f"US${invoice.shipment:.2f}"])
     table_data.append(["", "", "Total", f"US${invoice.total:.2f}"])
 
-    table = Table(table_data, colWidths=[200, 100, 100, 100])
+    # Create the table
+    table = Table(table_data, colWidths=[250, 75, 75, 75])
     table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor("#f2f2f2")),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.orange),
-        ('FONTNAME', (0, 0), (-1, 0), "Helvetica-Bold"),
-        ('ALIGN', (1, 1), (-1, -1), "RIGHT"),
-        ('ALIGN', (0, 0), (0, -1), "LEFT"),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey),  # Header background
+        ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),  # Header text color
+        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),  # Center-align quantity, rate, and amount
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),  # Inner grid lines
+        ('BOX', (0, 0), (-1, -1), 0.5, colors.black),  # Border around table
+        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),  # Header font bold
+        ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),  # Body font normal
+        ('FONTSIZE', (0, 0), (-1, -1), 10),
+        ('BACKGROUND', (0, 1), (-1, -2), colors.whitesmoke),  # Alternate row background
     ]))
 
-    table.wrapOn(p, margin, height - 400)
-    table.drawOn(p, margin, height - 500)
+    # Draw the table
+    table.wrapOn(p, margin, height - 500)
+    table.drawOn(p, margin, height - 500 - len(table_data) * 20)
 
-    # Notes and Terms section
-    y_position = 100  # Adjust the y_position based on content length
+    # Notes Section
+    notes_y = height - 500 - len(table_data) * 20 - 40
     p.setFont("Helvetica-Bold", 10)
-    p.drawString(margin, y_position, "Notes:")
+    p.drawString(margin, notes_y, "Notes:")
     p.setFont("Helvetica", 10)
-    p.drawString(margin + 50, y_position, invoice.notes or "No additional notes.")
+    p.drawString(margin, notes_y - 20, invoice.notes or "No additional notes.")
 
+    # Footer
+    footer_y = notes_y - 60
     p.setFont("Helvetica-Bold", 10)
-    p.drawString(margin, y_position - 20, "Terms:")
+    p.drawString(margin, footer_y, "Terms and Conditions:")
     p.setFont("Helvetica", 10)
-    p.drawString(margin + 50, y_position - 20, "All sales are final. Payment must be made within the specified terms.")
+    p.drawString(margin, footer_y - 20, "All sales are final. Payment must be made within the specified terms.")
 
+    # Finish PDF
     p.showPage()
     p.save()
     buffer.seek(0)
     return buffer.getvalue()
+
 
 
 class InvoicePDFView(APIView):

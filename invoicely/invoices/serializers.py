@@ -1,5 +1,3 @@
-# invoices/serializers.py
-# make the invoice model callable over api
 from rest_framework import serializers
 from .models import Invoice, InvoiceItem
 
@@ -10,13 +8,16 @@ class InvoiceItemSerializer(serializers.ModelSerializer):
 
 class InvoiceSerializer(serializers.ModelSerializer):
     items = InvoiceItemSerializer(many=True)
-    
+
     class Meta:
         model = Invoice
-        # fields = '__all__'
-        # havent added notes
-        fields = ( 'id', 'invoice_number', 'date', 'payment_terms', 'due_date', 'po_number', 'logo', 'sender', 'notes', 'customer_name', 'subtotal', 'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items' )
-    
+        fields = (
+            'id', 'invoice_number', 'date', 'payment_terms', 'due_date',
+            'po_number', 'logo', 'sender', 'notes', 'customer_name', 'subtotal',
+            'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items'
+        )
+        read_only_fields = ('user', 'subtotal')
+
     def create(self, validated_data):
         items_data = validated_data.pop('items')
         invoice = Invoice.objects.create(**validated_data)
@@ -33,7 +34,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
         instance.payment_terms = validated_data.get('payment_terms', instance.payment_terms)
         instance.due_date = validated_data.get('due_date', instance.due_date)
         instance.po_number = validated_data.get('po_number', instance.po_number)
-        instance.subtotal = validated_data.get('subtotal', instance.subtotal)
+        instance.logo = validated_data.get('logo', instance.logo)
+        instance.sender = validated_data.get('sender', instance.sender)
+        instance.notes = validated_data.get('notes', instance.notes)
+        instance.customer_name = validated_data.get('customer_name', instance.customer_name)
         instance.tax = validated_data.get('tax', instance.tax)
         instance.discount = validated_data.get('discount', instance.discount)
         instance.shipment = validated_data.get('shipment', instance.shipment)

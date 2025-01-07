@@ -20,6 +20,13 @@ class Invoice(models.Model):
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     balance_due = models.DecimalField(max_digits=10, decimal_places=2)
 
+    STATUS_CHOICES = [
+        ('paid', 'Paid'),
+        ('pending', 'Pending')
+    ]
+
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+
     @property
     def subtotal(self):
         return sum(item.amount or 0 for item in self.items.all())

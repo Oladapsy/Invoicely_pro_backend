@@ -46,7 +46,9 @@ INSTALLED_APPS = [
 
 ]
 
+
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',  # CORS middleware must be first
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -54,7 +56,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware', # add for cors middle ware
 ]
 
 
@@ -64,8 +65,25 @@ CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
 
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5174',
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:5174',
+# ]
+
+CORS_ALLOW_METHODS = [
+    'GET',
+    'POST',
+    'PUT',
+    'DELETE',
+    'PATCH',
+]
+
+# CORS_ALLOW_HEADERS = [
+#     'Content-Type',
+#     'Authorization'
+# ]
+
+CORS_ALLOW_HEADERS = [
+    '*',
 ]
 
 

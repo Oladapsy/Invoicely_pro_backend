@@ -22,17 +22,27 @@ class Invoice(models.Model):
 
     @property
     def subtotal(self):
-        return sum(item.amount for item in self.items.all())
+        return sum(item.amount or 0 for item in self.items.all())
+
 
     @property
     def total(self):
-        return self.subtotal + self.tax + self.shipment - self.discount
+        return (
+        self.subtotal +
+        (self.tax or 0) +
+        (self.shipment or 0) -
+        (self.discount or 0)
+    )
+
 
 
 class InvoiceItem(models.Model):
     invoice = models.ForeignKey(Invoice, related_name='items', on_delete=models.CASCADE)
     description = models.CharField(max_length=255, null=True)
-    quantity = models.IntegerField(null=True)
-    rate = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    amount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
+    quantity = models.IntegerField(default=0)
+    rate = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
+    def save(self, *args, **kwargs):
+        self.amount = (self.quantity or 0) * (self.rate or 0)
+        super().save(*args, **kwargs)

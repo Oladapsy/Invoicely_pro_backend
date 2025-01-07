@@ -1,10 +1,18 @@
 from rest_framework import serializers
 from .models import Invoice, InvoiceItem
 
+from rest_framework import serializers
+
 class InvoiceItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = InvoiceItem
-        fields = ('id', 'description', 'quantity', 'rate', 'amount')
+        fields = ['description', 'quantity', 'rate', 'amount']
+
+    def validate(self, data):
+        data['quantity'] = data.get('quantity', 0)
+        data['rate'] = data.get('rate', 0.0)
+        data['amount'] = data['quantity'] * data['rate']
+        return data
 
 class InvoiceSerializer(serializers.ModelSerializer):
     items = InvoiceItemSerializer(many=True)

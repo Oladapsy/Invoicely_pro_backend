@@ -9,7 +9,7 @@ class Invoice(models.Model):
     payment_terms = models.CharField(max_length=255, null=True)
     due_date = models.DateField(null=True)
     po_number = models.CharField(max_length=50, null=True)
-    logo = models.ImageField(upload_to='logos/', null=True, blank=True)  # Optional field for logo
+    logo = models.ImageField(upload_to='logos/', blank=True, null=True)  # Optional field for logo
     sender = models.CharField(max_length=255, default="Sender Name")  # Default value for sender
     notes = models.TextField(null=True, blank=True, default="") # notes just added
     customer_name = models.CharField(max_length=255, default="Customer Name")  # Default value for customer_name

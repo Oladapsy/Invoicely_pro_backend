@@ -25,6 +25,11 @@ SECRET_KEY = 'django-insecure-3odut_tu+$#-ilkl8bz9*5p-bh6-9k#u104eljlgjr^q8o^uxs
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+# the logo path
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
+
 ALLOWED_HOSTS = []
 
 

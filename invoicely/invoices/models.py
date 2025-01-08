@@ -18,7 +18,7 @@ class Invoice(models.Model):
     discount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     shipment = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    balance_due = models.DecimalField(max_digits=10, decimal_places=2)
+    # balance_due = models.DecimalField(max_digits=10, decimal_places=2)
 
     STATUS_CHOICES = [
         ('paid', 'Paid'),
@@ -31,6 +31,15 @@ class Invoice(models.Model):
     def subtotal(self):
         return sum(item.amount or 0 for item in self.items.all())
 
+
+    @property
+    def balance_due(self):
+        return (
+        self.subtotal +
+        (self.tax or 0) +
+        (self.shipment or 0) -
+        (self.discount or 0)
+    )
 
     @property
     def total(self):

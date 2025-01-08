@@ -32,14 +32,14 @@ class Invoice(models.Model):
         return sum(item.amount or 0 for item in self.items.all())
 
 
-    @property
-    def balance_due(self):
-        return (
-        self.subtotal +
-        (self.tax or 0) +
-        (self.shipment or 0) -
-        (self.discount or 0)
-    )
+    # @property
+    # def balance_due(self):
+    #     return (
+    #     self.subtotal +
+    #     (self.tax or 0) +
+    #     (self.shipment or 0) -
+    #     (self.discount or 0)
+    # )
 
     @property
     def total(self):

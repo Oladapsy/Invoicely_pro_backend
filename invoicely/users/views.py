@@ -7,7 +7,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
-from .serializers import UserSignupSerializer, UserLoginSerializer, UserDetailSerializer
+from .serializers import UserSignupSerializer, UserLoginSerializer, UserDetailSerializer, VerifyPasswordSerializer
+
 
 
 # Signup View
@@ -103,4 +104,12 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": "Invalid token"}, status=status.HTTP_400_BAD_REQUEST)
 
+
+# view to verify password
+class VerifyPasswordView(APIView):
+    def post(self, request, *args, **kwargs):
+        serializer = VerifyPasswordSerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            return Response({"message": "Password is correct."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

@@ -5,8 +5,6 @@ from .models import Invoice
 from .serializers import InvoiceSerializer
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
-from rest_framework import status
-from .serializers import VerifyPasswordSerializer
 
 
 # for pdf views or generator!!!
@@ -197,12 +195,4 @@ class EmailInvoiceView(APIView):
         email.attach('invoice.pdf', pdf_content, 'application/pdf')
         email.send()
         return Response({"message": "Invoice sent successfully"})
-
-# view to verify password
-class VerifyPasswordView(APIView):
-    def post(self, request, *args, **kwargs):
-        serializer = VerifyPasswordSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            return Response({"message": "Password is correct."}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

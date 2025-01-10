@@ -18,7 +18,7 @@ class Invoice(models.Model):
     discount = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     shipment = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, null=True)
-    # balance_due = models.DecimalField(max_digits=10, decimal_places=2)
+    balance_due = models.DecimalField(max_digits=10, decimal_places=2, default=0.0)
 
     STATUS_CHOICES = [
         ('paid', 'Paid'),

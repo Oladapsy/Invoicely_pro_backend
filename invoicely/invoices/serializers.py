@@ -71,6 +71,8 @@
 
 from rest_framework import serializers
 from .models import Invoice, InvoiceItem
+from django.contrib.auth import authenticate
+
 
 
 class InvoiceItemSerializer(serializers.ModelSerializer):
@@ -155,3 +157,14 @@ class InvoiceSerializer(serializers.ModelSerializer):
                 InvoiceItem.objects.create(invoice=instance, **item_data)
 
         return instance
+
+
+# to verify password end point serializer
+class VerifyPasswordSerializer(serializers.Serializer):
+    password = serializers.CharField()
+
+    def validate_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError("Old password is incorrect.")
+        return value

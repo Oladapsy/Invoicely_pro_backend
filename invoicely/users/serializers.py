@@ -6,6 +6,28 @@ from django.contrib.auth import authenticate
 # Serializer for User Signup
 # ensuring the password is hashed before serializing
 
+
+class UserUpdateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, required=False)
+
+    class Meta:
+        model = CustomUser
+        fields = ['full_name', 'company_name', 'email', 'password', 'logo']
+
+    def update(self, instance, validated_data):
+        # Hash the password if it is provided
+        password = validated_data.pop('password', None)
+        if password:
+            instance.password = make_password(password)
+
+        # Update other fields
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+
+        instance.save()
+        return instance
+
+
 class UserSignupSerializer(serializers.ModelSerializer):
     # the password will not be included in the serialized output returned by the API.
     password = serializers.CharField(write_only=True)

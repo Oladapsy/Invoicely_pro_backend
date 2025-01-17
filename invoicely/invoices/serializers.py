@@ -110,6 +110,10 @@ class InvoiceSerializer(serializers.ModelSerializer):
             'tax', 'discount', 'shipment', 'amount_paid', 'balance_due', 'items', 'status'
         )
         read_only_fields = ('user', 'subtotal')  # Prevent user and subtotal from being updated via API
+        
+        extra_kwargs = {
+            'logo': {'required': False, 'allow_null': True},  # Make logo optional
+        }
 
     def create(self, validated_data):
         """

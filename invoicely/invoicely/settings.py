@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
+# self added for media path (logo)
+import os
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,9 +28,6 @@ SECRET_KEY = 'django-insecure-3odut_tu+$#-ilkl8bz9*5p-bh6-9k#u104eljlgjr^q8o^uxs
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-# the logo path
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 
 ALLOWED_HOSTS = []
@@ -209,6 +209,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# the logo path
+# Media files settings
+MEDIA_URL = '/media/'  # URL prefix for media files
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Actual directory for media files
+
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

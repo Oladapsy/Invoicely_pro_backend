@@ -29,28 +29,54 @@ from django.core.mail import EmailMessage
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 
+####### old invoice create for json only #######
 
+# class InvoiceListCreateView(generics.ListCreateAPIView):
+#     queryset = Invoice.objects.all()
+#     serializer_class = InvoiceSerializer
+#     permission_classes = [IsAuthenticated]
+
+#     def get_queryset(self):
+#         # Overrides the default method to filter
+#         # invoices based on the authenticated user.
+#         # This ensures that each user can only see their own invoices.
+#         return self.queryset.filter(user=self.request.user)
+
+#     def perform_create(self, serializer):
+#         # Overrides the default method to automatically
+#         # set the user field of the new invoice to the 
+#         # authenticated user. This associates the newly 
+#         # created invoice with the user who made the request.
+#         # print('i am being called')
+#         serializer.save(user=self.request.user)
+# ###################
+# new invoice list create
+
+from rest_framework.parsers import MultiPartParser, FormParser
+import json
 
 class InvoiceListCreateView(generics.ListCreateAPIView):
     queryset = Invoice.objects.all()
     serializer_class = InvoiceSerializer
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]  # Add support for FormData
 
     def get_queryset(self):
-        # Overrides the default method to filter
-        # invoices based on the authenticated user.
-        # This ensures that each user can only see their own invoices.
         return self.queryset.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Overrides the default method to automatically
-        # set the user field of the new invoice to the 
-        # authenticated user. This associates the newly 
-        # created invoice with the user who made the request.
-        # print('i am being called')
-        serializer.save(user=self.request.user)
-        
+        # If the request is FormData, parse the `items` field manually
+        if self.request.content_type.startswith('multipart/form-data'):
+            items = self.request.data.get('items')
+            if items:
+                try:
+                    self.request.data['items'] = json.loads(items)
+                except json.JSONDecodeError:
+                    raise serializers.ValidationError({"items": "Invalid JSON format for items"})
 
+        serializer.save(user=self.request.user)
+
+        
 
 class InvoiceDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Invoice.objects.all()
